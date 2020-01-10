@@ -255,67 +255,83 @@ def find_neighbors(current_Node, tiles):
 
 	#Top Left Node
 	if current_Node.position[0] - 1 >= 0 and current_Node.position[1] - 1 >= 0:
-		tiles[current_Node.position[0] - 1][current_Node.position[1] - 1] = 5
-		newPosition = (current_Node.position[0] - 1, current_Node.position[1] - 1)
-		n1 = Node(current_Node, newPosition)
-		neighbors.append(n1)
-		#print("top left")
+		if (tiles[current_Node.position[0] - 1][current_Node.position[1] - 1] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0] - 1][current_Node.position[1] - 1] = 5
+			newPosition = (current_Node.position[0] - 1, current_Node.position[1] - 1)
+			n1 = Node(current_Node, newPosition)
+			neighbors.append(n1)
+			#print("top left")
 
 	#Top Middle Node
 	if current_Node.position[0] - 1 >= 0:
-		tiles[current_Node.position[0] - 1][current_Node.position[1]] = 5
-		newPosition = (current_Node.position[0] - 1, current_Node.position[1])
-		n2 = Node(current_Node, newPosition)
-		neighbors.append(n2)
-		#print ("top middle")
+		if (tiles[current_Node.position[0] - 1][current_Node.position[1]] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0] - 1][current_Node.position[1]] = 5
+			newPosition = (current_Node.position[0] - 1, current_Node.position[1])
+			n2 = Node(current_Node, newPosition)
+			neighbors.append(n2)
+			#print ("top middle")
 
 	#Top Right Node
 	if current_Node.position[0] - 1 >= 0 and current_Node.position[1] + 1 < len(tiles):
-		tiles[current_Node.position[0] - 1][current_Node.position[1] + 1] = 5
-		newPosition = (current_Node.position[0] - 1, current_Node.position[1] + 1)
-		n3 = Node(current_Node, newPosition)
-		neighbors.append(n3)
-		#print ("top right")
+		if (tiles[current_Node.position[0] - 1][current_Node.position[1] + 1] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0] - 1][current_Node.position[1] + 1] = 5
+			newPosition = (current_Node.position[0] - 1, current_Node.position[1] + 1)
+			n3 = Node(current_Node, newPosition)
+			neighbors.append(n3)
+			#print ("top right")
 
 		#Middle Left Node
 	if current_Node.position[1] - 1 >= 0:
-		tiles[current_Node.position[0]][current_Node.position[1] - 1] = 5
-		newPosition = (current_Node.position[0], current_Node.position[1] - 1)
-		n4 = Node(current_Node, newPosition)
-		neighbors.append(n4)
-		#print ("middle left")
+		if (tiles[current_Node.position[0]][current_Node.position[1] - 1] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0]][current_Node.position[1] - 1] = 5
+			newPosition = (current_Node.position[0], current_Node.position[1] - 1)
+			n4 = Node(current_Node, newPosition)
+			neighbors.append(n4)
+			#print ("middle left")
 
 		#Middle Right Node
 	if current_Node.position[1] + 1 < len(tiles):
-		tiles[current_Node.position[0]][current_Node.position[1] + 1] = 5
-		newPosition = (current_Node.position[0], current_Node.position[1] + 1)
-		n5 = Node(current_Node, newPosition)
-		neighbors.append(n5)
-		#print ("middle right")
+		if (tiles[current_Node.position[0]][current_Node.position[1] + 1] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0]][current_Node.position[1] + 1] = 5
+			newPosition = (current_Node.position[0], current_Node.position[1] + 1)
+			n5 = Node(current_Node, newPosition)
+			neighbors.append(n5)
+			#print ("middle right")
 
 	#Bottom Left Node
 	if current_Node.position[0] + 1 < len(tiles) and current_Node.position[1] - 1 >= 0:
-		tiles[current_Node.position[0] + 1][current_Node.position[1] - 1] = 5
-		newPosition = (current_Node.position[0] + 1, current_Node.position[1] - 1)
-		n6 = Node(current_Node, newPosition)
-		neighbors.append(n6)
-		#print ("bottom left")
+		if (tiles[current_Node.position[0] + 1][current_Node.position[1] - 1] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0] + 1][current_Node.position[1] - 1] = 5
+			newPosition = (current_Node.position[0] + 1, current_Node.position[1] - 1)
+			n6 = Node(current_Node, newPosition)
+			neighbors.append(n6)
+			#print ("bottom left")
 
 	#Bottom Middle Node
 	if current_Node.position[0] + 1 < len(tiles):
-		tiles[current_Node.position[0] + 1][current_Node.position[1]] = 5
-		newPosition = (current_Node.position[0] + 1, current_Node.position[1])
-		n7 = Node(current_Node, newPosition)
-		neighbors.append(n7)
-		#print ("bottom middle")
+		if (tiles[current_Node.position[0] + 1][current_Node.position[1]] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0] + 1][current_Node.position[1]] = 5
+			newPosition = (current_Node.position[0] + 1, current_Node.position[1])
+			n7 = Node(current_Node, newPosition)
+			neighbors.append(n7)
+			#print ("bottom middle")
 
 	#Bottom Right Node
 	if current_Node.position[0] + 1 < len(tiles) and current_Node.position[1] + 1 < len(tiles):
-		tiles[current_Node.position[0] + 1][current_Node.position[1] + 1] = 5
-		newPosition = (current_Node.position[0] + 1, current_Node.position[1] + 1)
-		n8 = Node(current_Node, newPosition)
-		neighbors.append(n8)
-		#print ("bottom middle")
+		if (tiles[current_Node.position[0] + 1][current_Node.position[1] + 1] != 3):
+			#print(tiles[current_Node.position[0]][current_Node.position[1]])
+			tiles[current_Node.position[0] + 1][current_Node.position[1] + 1] = 5
+			newPosition = (current_Node.position[0] + 1, current_Node.position[1] + 1)
+			n8 = Node(current_Node, newPosition)
+			neighbors.append(n8)
+			#print ("bottom middle")
 
 	return(neighbors)
 
@@ -503,10 +519,7 @@ def a_star(tiles, start, end):
 
 		for neighbor in neighbors:
 
-			if neighbor not in closedList and neighbor not in openList:
-
-				if (tiles[current_Node.position[0]][current_Node.position[1]] != 3):
-					print(tiles[current_Node.position[0]][current_Node.position[1]])
+			if neighbor not in closedList and neighbor not in openList:					
 
 					openList.append(neighbor)
 
@@ -523,7 +536,8 @@ def a_star(tiles, start, end):
 
 def drawPath(path, tiles):
 	for coord in path:
-		tiles[coord[0]][coord[1]] = 4
+		if tiles[coord[0]][coord[1]] != 1 and tiles[coord[0]][coord[1]] != 2:
+			tiles[coord[0]][coord[1]] = 4
 
 
 if __name__ == "__main__":
