@@ -21,7 +21,7 @@ def main():
 
 	display_width = 1000
 	display_height = 1000
-	square_dividers = 5
+	square_dividers = 10
 	
 	pygame.init()
 
@@ -109,7 +109,9 @@ def main():
 						#end = find_end(tiles)
 						#print(start, end)
 						path = a_star(tiles, start, end)
-						#print(path)
+						if path != None:
+							drawPath(path, tiles)
+							print(path)
 
 
 			
@@ -446,9 +448,15 @@ def a_star(tiles, start, end):
 '''
 
 def hueristic(current_Node, end_Node):
-	return ((current_Node.position[0] - (end_Node.position[0] + 1)) ** 2) + ((current_Node.position[1] - (end_Node.position[1] + 1)) ** 2)
+	a2 = (current_Node.position[0] - end_Node.position[0]) ** 2
+	b2 = (current_Node.position[1] - end_Node.position[1]) ** 2
+	return int(math.floor(10 * math.sqrt(a2 + b2)))
+
 
 def a_star(tiles, start, end):
+
+	openList = []
+	closedList = []
 	
 	start_Node = Node(None, start)
 	start_Node.g = 0
@@ -456,20 +464,66 @@ def a_star(tiles, start, end):
 	end_Node = Node(None, end)
 	end_Node.g = end_Node.h = end_Node.f = 0 
 
-	current_Node = start_Node
-
-	start_Node.h = hueristic(current_Node, end_Node)
+	start_Node.h = hueristic(start_Node, end_Node)
 	start_Node.f = start_Node.g + start_Node.h
 
 	current_Node = start_Node
 
-	print (start_Node.f)
+	openList.append(current_Node)
 
-	neighbors = find_neighbors(current_Node, tiles)
-	print (neighbors)
-	print(len(neighbors))
+	#print (start_Node.f)
 
-	#while current_Node != end_Node:
+	#print (neighbors)
+	#print(len(neighbors))
+
+	while (len(openList) > 0):
+
+		current_Node = openList[0]
+		current_Index = 0
+
+		for index, node in enumerate(openList):
+			#print(node)
+			if node.f < current_Node.f:
+				current_Index = index
+				current_Node = openList[current_Index]
+
+		if current_Node == end_Node:
+			#print("FINISHED")
+			path = []
+			current = current_Node
+			while current is not None:
+				path.append(current.position)
+				current = current.parent
+			return path[::-1]
+
+		openList.remove(current_Node)
+		closedList.append(current_Node)
+
+		neighbors = find_neighbors(current_Node, tiles)
+
+		for neighbor in neighbors:
+
+			if neighbor not in closedList and neighbor not in openList:
+
+				if (tiles[current_Node.position[0]][current_Node.position[1]] != 3):
+					print(tiles[current_Node.position[0]][current_Node.position[1]])
+
+					openList.append(neighbor)
+
+					neighbor.parent = current_Node
+
+					neighbor.g = hueristic(neighbor, start_Node)
+					neighbor.h = hueristic(neighbor, end_Node)
+					neighbor.f = neighbor.h + neighbor.g
+
+			#print(neighbor.position, neighbor.g, neighbor.h)
+
+		#current_Node = end_Node
+
+
+def drawPath(path, tiles):
+	for coord in path:
+		tiles[coord[0]][coord[1]] = 4
 
 
 if __name__ == "__main__":
