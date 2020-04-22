@@ -34,17 +34,6 @@ class Grid():
 		self.startNode = None
 		self.endNode = None
 
-		'''
-		row = []
-		for j in range(self.size):
-			for i in range(self.size):
-				node = Node(None, (i,j))
-				#print(node.position)
-			row.append(node)
-
-			self.nodes.append(row)
-		'''
-
 		for j in range(self.size):
 			row = []
 			for i in range(self.size):
@@ -67,7 +56,6 @@ class Grid():
 			pygame.draw.line(screen, line_color, (0 , x * int(display_width / grid_size)), (display_height, x * sizeInterval), 5)
 
 	def colorPath(self, path):
-		#print(path)
 		for node in path:
   			if node.color != RED and node.color != GREEN:
   				node.color = YELLOW
@@ -77,12 +65,6 @@ class Grid():
 		row = math.ceil(mousePos[0] / (display_height / grid_size)) - 1
 		col = math.ceil(mousePos[1] / (display_height / grid_size)) - 1
 
-		#currentNode = self.nodes[col + (grid_size * row)]
-		#print (col, row)
-		#print(self.nodes)
-		#print("mouse at", col, row)
-
-		#currentNode = self.nodes[col][row]
 		currentNode = self.nodes[col][row]
 
 		try:
@@ -114,24 +96,18 @@ class Grid():
 				self.nodes[col][row].color = WHITE	
 		except:
 			pass
-  			#print("Out of bounds")
 
 	def findNeighbors(self, node):
 
 		neighbors = []
 		for neighbor in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
 
-			#print(node.position)
-
 			col = node.position[1] + neighbor[1]	
 			row = node.position[0] + neighbor[0]
-
-			#print(col, row)
 
 			if col >= 0 and col < self.size:
 				if row >= 0 and row < self.size:
 					neighbor = self.nodes[col][row]
-					#print(col, row, neighbor.position)
 
 					if neighbor.color != GRAY:
 						if neighbor.color != GREEN and neighbor.color != RED:
@@ -140,33 +116,6 @@ class Grid():
 						neighbors.append(neighbor)
 
 		return (neighbors)
-
-'''
-
-  			#print(node.position, self.size, node.position[0] + neighbor[0], node.position[1] + neighbor[1])
-  			try:
-  				#c = (node.position[0] + neighbor[0]) + (self.size * (node.position[1] + neighbor[1]))
-  				col = node.position[1] + neighbor[1]
-  				row = node.position[0] + neighbor[0]
-  				#print(c)
-  				neighbor = self.nodes[col][row]
-  				#neighbor = self.nodes[(node.position[0] + neighbor[0]) + (self.grid.size * (node.position[1] + neighbor[1]))]
-  				#neighbor = (node.position[0] + position[0], node.position[1] + position[1])
-  				if neighbor.color != GRAY:
-  					if neighbor.color != GREEN and neighbor.color != RED:
-  						neighbor.color = BLUE
-  					neighbors.append(neighbor)
-  					#print(neighbor.position)
-
-  			except:
-  				pass
-  				#print("Out of bounds")
-  		#print(neighbors)
-  		#print(len(neighbors))
-  		return (neighbors)
-
-			'''
-
 
 class Node():
 
@@ -188,7 +137,6 @@ class Node():
 		self.color = color 
 
 	def draw(self, sizeInterval, screen):
-		#print(self.position[0] * sizeInterval, self.position[1] * sizeInterval)
 		pygame.draw.rect(screen, self.color, (self.position[0] * sizeInterval, self.position[1] * sizeInterval, display_height / grid_size, display_height / grid_size))
 
 class A_STAR():
@@ -197,12 +145,10 @@ class A_STAR():
 		self.grid = grid
 		self.openSet = []
 		self.closedSet = []
-		#self.currentNode = None
 
 
 	def distance(self, start, end):
 		return (math.sqrt((end.position[0] - start.position[0])**2 + (end.position[1] - start.position[1])**2))
-		#return int(10 * math.sqrt((end.position[0] - start.position[0])**2 + (end.position[1] - start.position[1])**2))
 
 	def start(self):
 		self.openSet.append(self.grid.startNode)
@@ -218,15 +164,8 @@ class A_STAR():
 
 		while len(self.openSet) > 0:
 
-			#print(len(self.openSet))
-
 			currentNode = self.openSet[0]
 
-			'''
-			for node in self.openSet:
-				if node.f < currentNode.f:
-					currentNode = node
-			'''
 			for node in self.openSet:
 				if node.f < currentNode.f:
 					currentNode = node
@@ -235,7 +174,6 @@ class A_STAR():
 						currentNode = node
 
 			if currentNode == self.grid.endNode:
-				#print (self.grid.endNode)
 				path = [self.grid.endNode]
 				current = self.grid.endNode
 
@@ -243,7 +181,6 @@ class A_STAR():
 					path.append(current.parent)
 					current = current.parent
 
-				#print(path[::-1])
 				return path[::-1]
 
 			self.openSet.remove(currentNode)
@@ -264,46 +201,6 @@ class A_STAR():
 					neighbor.h = self.distance(neighbor, self.grid.endNode)
 					neighbor.calcF()
 					neighbor.parent = currentNode
-
-
-					'''
-
-					if neighbor in self.openSet:
-						if (temp_G < neighbor.g):
-							neighbor.g = temp_G
-							newPath = True
-
-					else:
-						neighbor.g = temp_G
-						newPath = True
-						self.openSet.append(neighbor)
-
-					if (newPath):
-						neighbor.h = self.distance(neighbor, self.grid.endNode)
-						neighbor.calcF()
-						neighbor.parent = currentNode
-					'''
-
-				'''
-				print(self.distance(neighbor, self.grid.startNode))
-				neighbor.g = self.distance(neighbor, self.grid.startNode)
-				neighbor.h = self.distance(neighbor, self.grid.endNode)
-				neighbor.calcF()
-
-				tentative_gScore = neighbor.g + self.distance(currentNode, neighbor)
-
-				if tentative_gScore < neighbor.g:
-					neighbor.parent = currentNode
-					neighbor.g = tentative_gScore
-					neighbor.calcF()
-
-					if neighbor not in self.closedSet:
-						self.openSet.append(neighbor)
-
-
-				'''
-
-		#print(self.openSet)
 
 def main():
 
@@ -342,16 +239,12 @@ def main():
 				if canSelect == True:
 
 					if event.key == pygame.K_s:
-						#print("s")
 						buttonColor = GREEN
 					if event.key == pygame.K_e:
-						#print("e")
 						buttonColor = RED
 					if event.key == pygame.K_w:
-						#print("w")
 						buttonColor = GRAY
 					if event.key == pygame.K_RETURN:
-						#print("return")
 						canSelect = False
 						astar = A_STAR(grid)
 						path = astar.start()
@@ -368,4 +261,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
