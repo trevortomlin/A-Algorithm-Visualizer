@@ -1,7 +1,7 @@
 # A-Star-Algorithm-Visualizer
 
-Gui that visualizes the A* pathfinding algorithm 
-![](https://raw.github.com/trevortomlin/A-Star-Algorithm-Visualizer/master/algorithmimage.png)
+Gui that visualizes the A* pathfinding algorithm <br />
+<img src="algorithmimage.png" width=40% height=40%>
 
 ## Description
 This projects visualizes the pathfinding algorithm A* using a grid. It uses Pygame for the window and user input. The algorithm is implemented using a Priority Queue and is guaranteed to find the shortest path if there is one.
@@ -24,7 +24,7 @@ Python, pygame, Priority Queues
 
 [Wikipedia](https://en.wikipedia.org/wiki/A*_search_algorithm)\
 [Red Blob Games](https://www.redblobgames.com/pathfinding/a-star/implementation.html)\
-[Towards Data Science](https://towardsdatascience.com/priority-queues-in-python-3baf0bac2097)\
+[Towards Data Science](https://towardsdatascience.com/priority-queues-in-python-3baf0bac2097)
 
 ## License
 
