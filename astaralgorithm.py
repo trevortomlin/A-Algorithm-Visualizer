@@ -8,6 +8,7 @@
 
 import pygame
 import math
+import heapq
 
 RED = (255,0,0)
 BLUE = (0,0,255)
@@ -17,13 +18,30 @@ WHITE = (255,255,255)
 GRAY = (128,128,128)
 YELLOW = (255,255,0)
 
-display_width = 800
-display_height = 800
-menu_bar_size = 250
+DISPLAY_WIDTH = 800
+DISPLAY_HEIGHT = 800
+MENU_BAR_SIZE = 250
 
-grid_size = 20
-line_width = 5
-line_color = BLACK
+GRID_SIZE = 20
+LINE_WIDTH = 5
+LINE_COLOR = BLACK
+
+
+# Taken from https://towardsdatascience.com/priority-queues-in-python-3baf0bac2097
+class PriorityQueue:
+	def __init__(self):
+		self._queue = []
+		self._index = 0
+
+	def is_empty(self):
+		return not self._queue
+    
+	def push(self, item, priority):
+		heapq.heappush(self._queue, (priority, self._index, item))
+		self._index += 1
+    
+	def pop(self):
+		return heapq.heappop(self._queue)[-1]
 
 
 class Grid():
@@ -37,23 +55,23 @@ class Grid():
 		for j in range(self.size):
 			row = []
 			for i in range(self.size):
-				node = Node(None, (i,j))
+				node = Node((i,j))
+				#node.h = A_STAR.distance(node, self.endNode)
 				row.append(node)
 			self.nodes.append(row)
 
-
 	def draw(self, screen):
 
-		sizeInterval = int(display_height / grid_size)
+		sizeInterval = int(DISPLAY_HEIGHT / GRID_SIZE)
 
 		for row in self.nodes:
 			for node in row:
 				node.draw(sizeInterval, screen)
 	
-		for x in range(0, grid_size + 1):
-			pygame.draw.line(screen, line_color, (x * sizeInterval, 0), (x * sizeInterval, display_height), 5)
-		for x in range(0, grid_size + 1 ):
-			pygame.draw.line(screen, line_color, (0 , x * int(display_width / grid_size)), (display_height, x * sizeInterval), 5)
+		for x in range(0, GRID_SIZE + 1):
+			pygame.draw.line(screen, LINE_COLOR, (x * sizeInterval, 0), (x * sizeInterval, DISPLAY_HEIGHT), 5)
+		for x in range(0, GRID_SIZE + 1 ):
+			pygame.draw.line(screen, LINE_COLOR, (0 , x * int(DISPLAY_WIDTH / GRID_SIZE)), (DISPLAY_HEIGHT, x * sizeInterval), 5)
 
 	def colorPath(self, path):
 		for node in path:
@@ -62,8 +80,8 @@ class Grid():
 
 	def button_handler(self, screen, color):
 		mousePos = pygame.mouse.get_pos()
-		row = math.ceil(mousePos[0] / (display_height / grid_size)) - 1
-		col = math.ceil(mousePos[1] / (display_height / grid_size)) - 1
+		row = math.ceil(mousePos[0] / (DISPLAY_HEIGHT / GRID_SIZE)) - 1
+		col = math.ceil(mousePos[1] / (DISPLAY_HEIGHT / GRID_SIZE)) - 1
 
 		currentNode = self.nodes[col][row]
 
@@ -119,8 +137,8 @@ class Grid():
 
 class Node():
 
-	def __init__(self, parent=None, position=None, color=WHITE):
-		self.parent = parent
+	def __init__(self, position=None, color=WHITE):
+		self.parent = None
 		self.position = position
 		self.neighbors = []
 		self.color = color
@@ -129,6 +147,11 @@ class Node():
 		self.h = 0
 		self.f = 0
 
+	def calcG(self, start):
+		self.g = A_STAR.distance(self, start)
+
+	def calcH(self, end):
+		self.h = A_STAR.distance(self, end)
 
 	def calcF(self):
 		self.f = self.h + self.g
@@ -137,7 +160,7 @@ class Node():
 		self.color = color 
 
 	def draw(self, sizeInterval, screen):
-		pygame.draw.rect(screen, self.color, (self.position[0] * sizeInterval, self.position[1] * sizeInterval, display_height / grid_size, display_height / grid_size))
+		pygame.draw.rect(screen, self.color, (self.position[0] * sizeInterval, self.position[1] * sizeInterval, DISPLAY_HEIGHT / GRID_SIZE, DISPLAY_HEIGHT / GRID_SIZE))
 
 class A_STAR():
 
@@ -146,61 +169,101 @@ class A_STAR():
 		self.openSet = []
 		self.closedSet = []
 
-
-	def distance(self, start, end):
+	# Euclidean Distance
+	@staticmethod
+	def distance(start, end):
 		return (math.sqrt((end.position[0] - start.position[0])**2 + (end.position[1] - start.position[1])**2))
 
+	def reconstructPath(node):
+		path = []
+
+		currentnode = node
+
+		while(currentnode is not None):
+			path.append(currentnode)
+
+		return path
+
+
+	# Code from https://en.wikipedia.org/wiki/A*_search_algorithm
 	def start(self):
-		self.openSet.append(self.grid.startNode)
 
-		neighbors = self.grid.findNeighbors(self.grid.startNode)
+		openSet = PriorityQueue();
+		openSet.push(self.grid.startNode, 0)
 
-		for neighbor in neighbors:
-			neighbor.parent = self.grid.startNode
-			self.openSet.append(neighbor)
+		self.grid.startNode.parent = None
+		self.grid.startNode.g = 0
+		self.grid.startNode.f = A_STAR.distance(self.grid.startNode, self.grid.endNode)
 
-		self.openSet.remove(self.grid.startNode)
-		self.closedSet.append(self.grid.startNode)
+		while not openSet.is_empty():
+			current = openSet.pop()
 
-		while len(self.openSet) > 0:
+			if current == self.grid.endNode:
+				return reconstructPath(current)
 
-			currentNode = self.openSet[0]
+			for neighbor in self.grid.findNeighbors(current):
 
-			for node in self.openSet:
-				if node.f < currentNode.f:
-					currentNode = node
-				elif node.f == currentNode.f:
-					if node.h < currentNode.h:
-						currentNode = node
+				newGScore = current.g + A_STAR.distance(current, neighbor)
 
-			if currentNode == self.grid.endNode:
-				path = [self.grid.endNode]
-				current = self.grid.endNode
+				neighbor.calcG(self.grid.endNode)
 
-				while (current.parent != None):
-					path.append(current.parent)
-					current = current.parent
+				if newGScore < neighbor.g:
+					neighbor.parent = current
+					neighbor.g = newGScore
+					neighbor.f = neighbor.g + A_STAR.distance(neighbor, self.grid.endNode)
+					if neighbor not in openSet._queue:
+						openSet.push(neighbor, neighbor.f)
 
-				return path[::-1]
+		# self.openSet.append(self.grid.startNode)
 
-			self.openSet.remove(currentNode)
-			self.closedSet.append(currentNode)
+		# neighbors = self.grid.findNeighbors(self.grid.startNode)
 
-			for neighbor in self.grid.findNeighbors(currentNode):
+		# for neighbor in neighbors:
+		# 	neighbor.parent = self.grid.startNode
+		# 	self.openSet.append(neighbor)
+
+		# self.openSet.remove(self.grid.startNode)
+		# self.closedSet.append(self.grid.startNode)
+
+		# while len(self.openSet) > 0:
+
+		# 	currentNode = self.openSet[0]
+
+		# 	for node in self.openSet:
+		# 		if node.f < currentNode.f:
+		# 			currentNode = node
+		# 		elif node.f == currentNode.f:
+		# 			if node.h < currentNode.h:
+		# 				currentNode = node
+
+		# 	if currentNode == self.grid.endNode:
+		# 		path = [self.grid.endNode]
+		# 		current = self.grid.endNode
+
+		# 		while (current.parent != None):
+		# 			path.append(current.parent)
+		# 			current = current.parent
+
+		# 		return path[::-1]
+
+		# 	self.openSet.remove(currentNode)
+		# 	self.closedSet.append(currentNode)
+
+		# 	for neighbor in self.grid.findNeighbors(currentNode):
 
 
-				if neighbor not in self.closedSet and neighbor.color != GRAY:
-					temp_G = neighbor.g + self.distance(neighbor, currentNode)
+		# 		if neighbor not in self.closedSet and neighbor.color != GRAY:
+		# 			temp_G = neighbor.g + self.distance(neighbor, currentNode)
 
-					if neighbor not in self.openSet:
-						self.openSet.append(neighbor)
-					elif temp_G >= neighbor.g:
-						continue
+		# 			if neighbor not in self.openSet:
+		# 				self.openSet.append(neighbor)
+		# 			elif temp_G >= neighbor.g:
+		# 				continue
 
-					neighbor.g = temp_G
-					neighbor.h = self.distance(neighbor, self.grid.endNode)
-					neighbor.calcF()
-					neighbor.parent = currentNode
+		# 			neighbor.g = temp_G
+		# 			neighbor.h = self.distance(neighbor, self.grid.endNode)
+		# 			neighbor.calcF()
+		# 			neighbor.parent = currentNode
 
 def main():
 
@@ -209,12 +272,12 @@ def main():
 	icon = pygame.image.load('icon.png')
 	menubar = pygame.image.load('menubar.png')
 	pygame.display.set_icon(icon)
-	screen = pygame.display.set_mode((display_width, display_height + menu_bar_size))
+	screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT + MENU_BAR_SIZE))
 	screen.fill(BLACK)
 	clock = pygame.time.Clock()
 
 
-	grid = Grid(grid_size)
+	grid = Grid(GRID_SIZE)
 
 	running = True
 
