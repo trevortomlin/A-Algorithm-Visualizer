@@ -1,24 +1,31 @@
 # A-Star-Algorithm-Visualizer
-## Gui that visualizes the A* pathfinding algorithm 
+
+Gui that visualizes the A* pathfinding algorithm 
 ![](https://raw.github.com/trevortomlin/A-Star-Algorithm-Visualizer/master/algorithmimage.png)
 
-**How to use:** 
+## Description
+This projects visualizes the pathfinding algorithm A* using a grid. It uses Pygame for the window and user input. The algorithm is implemented using a Priority Queue and is guaranteed to find the shortest path if there is one.
+
+## Usage
 1. Run the program.
 2. Press S to select a start point.
 3. Press E to select an ending point.
 4. Press W to select any amount of walls.
-5. Press Return to see the algorithm run.
+5. Press Enter to see the algorithm run.
 
-I spent far too long on this project and was unable to completely finish it. I am taking a break from this project and I might come back to fix it later. This program shows how to create a window, handle user input, and to use a pathfinding algorithm. The algorithm correctly finds a valid path, however, it is not the shortest path.
+## Technologies Used
+Python, pygame, Priority Queues
 
-### What I learned from this project:
-- How to use Git and Github for version control.
-- Using classes to make more readable and faster code.
-- How to use Pygame to display things on the screen.
-- Pathfinding algorithms.
+## Improvements
+ - Clean up some messy code.
+ - Make sure variables and functions are named properly.
 
-### What I need to work on:
-- Knowing when to quit a project and move on.
-- Debugging.
-- Implementing classes.
+## References
 
+[Wikipedia](https://en.wikipedia.org/wiki/A*_search_algorithm)\
+[Red Blob Games](https://www.redblobgames.com/pathfinding/a-star/implementation.html)\
+[Towards Data Science](https://towardsdatascience.com/priority-queues-in-python-3baf0bac2097)\
+
+## License
+
+This project is licensed under the  MIT License - see the LICENSE file for details.
