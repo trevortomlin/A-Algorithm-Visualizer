@@ -55,8 +55,7 @@ class Grid():
 		for j in range(self.size):
 			row = []
 			for i in range(self.size):
-				node = Node((i,j))
-				#node.h = A_STAR.distance(node, self.endNode)
+				node = Node((j,i))
 				row.append(node)
 			self.nodes.append(row)
 
@@ -75,13 +74,13 @@ class Grid():
 
 	def colorPath(self, path):
 		for node in path:
-  			if node.color != RED and node.color != GREEN:
+  			if node is not self.startNode and node is not self.endNode:
   				node.color = YELLOW
 
 	def button_handler(self, screen, color):
 		mousePos = pygame.mouse.get_pos()
-		row = math.ceil(mousePos[0] / (DISPLAY_HEIGHT / GRID_SIZE)) - 1
-		col = math.ceil(mousePos[1] / (DISPLAY_HEIGHT / GRID_SIZE)) - 1
+		row = math.ceil(mousePos[1] / (DISPLAY_HEIGHT / GRID_SIZE)) - 1
+		col = math.ceil(mousePos[0] / (DISPLAY_HEIGHT / GRID_SIZE)) - 1
 
 		currentNode = self.nodes[col][row]
 
@@ -118,19 +117,20 @@ class Grid():
 	def findNeighbors(self, node):
 
 		neighbors = []
-		for neighbor in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
+		for neighbor in [(-1, -1), (0, -1), (-1, 0), (0, 1),  (1, 0), (-1, 1), (1, -1), (1, 1)]:
 
 			col = node.position[1] + neighbor[1]	
 			row = node.position[0] + neighbor[0]
 
-			if col >= 0 and col < self.size:
-				if row >= 0 and row < self.size:
-					neighbor = self.nodes[col][row]
+			print(node.position, row, col)
+
+			if row >= 0 and row < self.size:
+				if col >= 0 and col < self.size:
+					neighbor = self.nodes[row][col]
 
 					if neighbor.color != GRAY:
 						if neighbor.color != GREEN and neighbor.color != RED:
 							neighbor.color = BLUE
-
 						neighbors.append(neighbor)
 
 		return (neighbors)
@@ -143,21 +143,9 @@ class Node():
 		self.neighbors = []
 		self.color = color
 
-		self.g = 0
-		self.h = 0
+		self.g = float('inf')
+		self.h = float('inf')
 		self.f = 0
-
-	def calcG(self, start):
-		self.g = A_STAR.distance(self, start)
-
-	def calcH(self, end):
-		self.h = A_STAR.distance(self, end)
-
-	def calcF(self):
-		self.f = self.h + self.g
-
-	def setColor(self, color):
-		self.color = color 
 
 	def draw(self, sizeInterval, screen):
 		pygame.draw.rect(screen, self.color, (self.position[0] * sizeInterval, self.position[1] * sizeInterval, DISPLAY_HEIGHT / GRID_SIZE, DISPLAY_HEIGHT / GRID_SIZE))
@@ -166,21 +154,20 @@ class A_STAR():
 
 	def __init__(self, grid):
 		self.grid = grid
-		self.openSet = []
-		self.closedSet = []
 
 	# Euclidean Distance
 	@staticmethod
 	def distance(start, end):
-		return (math.sqrt((end.position[0] - start.position[0])**2 + (end.position[1] - start.position[1])**2))
+		return (math.sqrt(((end.position[1] - start.position[1]))**2 + ((end.position[0] - start.position[0]))**2))
 
-	def reconstructPath(node):
+	def reconstructPath(self, node):
 		path = []
 
 		currentnode = node
 
 		while(currentnode is not None):
 			path.append(currentnode)
+			currentnode = currentnode.parent
 
 		return path
 
@@ -189,86 +176,35 @@ class A_STAR():
 	def start(self):
 
 		openSet = PriorityQueue();
-		openSet.push(self.grid.startNode, 0)
 
 		self.grid.startNode.parent = None
 		self.grid.startNode.g = 0
 		self.grid.startNode.f = A_STAR.distance(self.grid.startNode, self.grid.endNode)
 
-		while not openSet.is_empty():
-			current = openSet.pop()
+		openSet.push(self.grid.startNode, self.grid.startNode.f)
 
-			if current == self.grid.endNode:
-				return reconstructPath(current)
+		while not openSet.is_empty():
+
+			current = openSet.pop()
+			
+			if current is self.grid.endNode:
+				return self.reconstructPath(current)
 
 			for neighbor in self.grid.findNeighbors(current):
 
 				newGScore = current.g + A_STAR.distance(current, neighbor)
 
-				neighbor.calcG(self.grid.endNode)
-
-				if newGScore < neighbor.g:
+				if newGScore < neighbor.g or neighbor.g == float('inf'):
 					neighbor.parent = current
 					neighbor.g = newGScore
 					neighbor.f = neighbor.g + A_STAR.distance(neighbor, self.grid.endNode)
-					if neighbor not in openSet._queue:
-						openSet.push(neighbor, neighbor.f)
 
-		# self.openSet.append(self.grid.startNode)
-
-		# neighbors = self.grid.findNeighbors(self.grid.startNode)
-
-		# for neighbor in neighbors:
-		# 	neighbor.parent = self.grid.startNode
-		# 	self.openSet.append(neighbor)
-
-		# self.openSet.remove(self.grid.startNode)
-		# self.closedSet.append(self.grid.startNode)
-
-		# while len(self.openSet) > 0:
-
-		# 	currentNode = self.openSet[0]
-
-		# 	for node in self.openSet:
-		# 		if node.f < currentNode.f:
-		# 			currentNode = node
-		# 		elif node.f == currentNode.f:
-		# 			if node.h < currentNode.h:
-		# 				currentNode = node
-
-		# 	if currentNode == self.grid.endNode:
-		# 		path = [self.grid.endNode]
-		# 		current = self.grid.endNode
-
-		# 		while (current.parent != None):
-		# 			path.append(current.parent)
-		# 			current = current.parent
-
-		# 		return path[::-1]
-
-		# 	self.openSet.remove(currentNode)
-		# 	self.closedSet.append(currentNode)
-
-		# 	for neighbor in self.grid.findNeighbors(currentNode):
-
-
-		# 		if neighbor not in self.closedSet and neighbor.color != GRAY:
-		# 			temp_G = neighbor.g + self.distance(neighbor, currentNode)
-
-		# 			if neighbor not in self.openSet:
-		# 				self.openSet.append(neighbor)
-		# 			elif temp_G >= neighbor.g:
-		# 				continue
-
-		# 			neighbor.g = temp_G
-		# 			neighbor.h = self.distance(neighbor, self.grid.endNode)
-		# 			neighbor.calcF()
-		# 			neighbor.parent = currentNode
+					openSet.push(neighbor, neighbor.f)
 
 def main():
 
 	pygame.init()
-	pygame.display.set_caption("A* Algorithm")
+	pygame.display.set_caption("A* Algorithm Visualizer")
 	icon = pygame.image.load('icon.png')
 	menubar = pygame.image.load('menubar.png')
 	pygame.display.set_icon(icon)
